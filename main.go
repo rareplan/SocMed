@@ -37,6 +37,7 @@ func main() {
 	mux.HandleFunc("/home", entities.AuthMiddleware([]string{"admin", "checker", "user"}, entities.Dashboard))
 	mux.HandleFunc("/calendar", entities.AuthMiddleware([]string{"admin", "checker", "user"}, entities.Calendar))
 	mux.HandleFunc("/note", entities.AuthMiddleware([]string{"admin", "checker", "user"}, entities.Note))
+	mux.HandleFunc("/activity", entities.AuthMiddleware([]string{"admin", "checker", "user"}, entities.Act))
 	mux.HandleFunc("/logout", entities.AuthMiddleware([]string{"admin", "checker", "user"}, index.Logout))
 	mux.HandleFunc("/invalid", entities.AuthMiddleware([]string{"admin", "checker"}, index.Invalid))
 	mux.HandleFunc("/success", entities.AuthMiddleware([]string{"admin", "checker"}, index.Success))

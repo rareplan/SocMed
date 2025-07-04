@@ -223,3 +223,35 @@ func Note(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
+
+func Act(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("auth_token")
+	if err != nil {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+	username := cookie.Value
+
+	session, ok := sessions[username]
+	if !ok {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	// Role flags for template
+	data := struct {
+		IsAdmin   bool
+		IsUser    bool
+		IsChecker bool
+	}{
+		IsAdmin:   session.Role == "admin",
+		IsUser:    session.Role == "user",
+		IsChecker: session.Role == "checker",
+	}
+
+	err = config.TPL.ExecuteTemplate(w, "/activity", data)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
