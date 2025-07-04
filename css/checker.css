@@ -1,0 +1,59 @@
+body {
+      background-color: #f8f9fa;
+ 
+    }
+
+    .form-label {
+      font-weight: 500;
+    }
+
+    .container {
+      max-width: 900px;
+    }
+
+    .thead-blue {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .card {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+    }
+
+    .table-responsive {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    td {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 200px;
+    }
+
+     td {
+    max-width: 200px;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  td::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  td::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 10px;
+  }
+
+   .truncate-cell {
+      max-width: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    textarea {
+      resize: vertical;
+    }

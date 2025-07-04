@@ -1,0 +1,27 @@
+{{define "/welcome"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="icon" type="image/x-icon" href="/css/image/icon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Welcome SocMed</title>
+  <link rel="stylesheet" type="text/css" href="/css/welcome.css"/>
+</head>
+<script type="text/javascript">
+    function preventBack() { window.history.forward(); }
+    setTimeout("preventBack()", 0);
+    window.onunload = function () { null; };
+</script>
+<body>
+  <canvas id="background"></canvas>
+  <div class="welcome-container">
+    <h1 class="welcome-text">Welcome to SocMed!🎉</h1>
+    <p class="sub-text">Start posting. Start connecting.</p>
+  </div>
+
+  <script src="/js/welcome.js"></script>
+</body>
+</html>
+{{end}}

@@ -1,0 +1,31 @@
+{{define "/success"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/x-icon" href="/css/image/icon.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="/css/success.css">
+  <title>Success</title>
+</head>
+<script type="text/javascript">
+    function preventBack() { window.history.forward(); }
+    setTimeout("preventBack()", 0);
+    window.onunload = function () { null; };
+</script>
+<body>
+
+  <div class="confetti" id="confetti"></div>
+
+  <div class="text-container">
+    <h1>🎉 Submission Complete!</h1>
+    <p>Thanks! Your poster has been submitted for review.</p>
+    <button class="back-btn" onclick="goBack()">← Back to Page</button>
+  </div>
+
+  <script src="/js/success.js"></script>
+
+</body>
+</html>
+
+{{end}}

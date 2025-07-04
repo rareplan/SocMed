@@ -1,0 +1,137 @@
+{{define "/allchecker"}}
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="icon" type="image/x-icon" href="/css/image/icon.png">
+  <title>Approval Hub</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css">
+  <link rel="stylesheet" type="text/css" href="/css/sidebar.css">
+  <link rel="stylesheet" type="text/css" href="/css/checker.css">
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+<div class="d-flex" id="wrapper">
+  <!-- Sidebar -->
+  <div id="sidebar-wrapper">
+    <img src="/css/image/dash.png" alt="dash" class="dash">
+    <div class="list-group list-group-flush">
+      <a href="/home" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-home me-2"></i> Home</a>
+      {{if .IsAdmin}}
+        <a href="/useraccess" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-clipboard-user me-2"></i> User Access</a>
+        <a href="/allposter" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-image me-2"></i> Poster</a>
+        <a href="/allposterchecker" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-clipboard-check me-2"></i> Approval Hub</a>
+      {{end}}
+
+      {{if .IsUser}}
+        <a href="/allposter" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-image me-2"></i> Poster</a>
+      {{end}}
+
+      {{if .IsChecker}}
+        <a href="/allposterchecker" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-clipboard-check me-2"></i> Approval Hub</a>
+      {{end}}
+
+      <a href="#calendarSubmenu" class="list-group-item list-group-item-action bg-dark text-white" data-toggle="collapse" aria-expanded="false">
+        <i class="fas fa-layer-group"></i> My Space <i class="fas fa-caret-down float-right"></i>
+      </a>
+      <div class="collapse" id="calendarSubmenu">
+        <a href="/calendar" class="list-group-item list-group-item-action bg-secondary text-white pl-5">
+          <i class="fas fa-calendar-alt me-2"></i> Content Calendar</a>
+        <a href="/note" class="list-group-item list-group-item-action bg-secondary text-white pl-5">
+          <i class="fas fa-sticky-note me-2"></i> Note</a>
+        <a href="/game" class="list-group-item list-group-item-action bg-secondary text-white pl-5">
+          <i class="fas fa-gamepad me-2"></i> Games</a>
+      </div>
+
+      <a href="/logout" class="list-group-item list-group-item-action bg-dark " style="color: rgb(255, 35, 35);">
+        <i class="fas fa-sign-out-alt me-2" style="color: rgb(255, 35, 35);"></i> Logout</a>
+    </div>
+  </div>
+
+  <!-- Page Content -->
+  <div id="page-content-wrapper" class="container-fluid p-4">
+    <button class="btn btn-primary mb-3" id="menu-toggle">☰ Sidebar</button>
+    
+    <!-- Posters Table -->
+    <div class="card p-4">
+      <h4 class="mb-3">Posters Table</h4>
+      <div class="table-responsive">
+        <table id="postersTable" class="table table-striped table-bordered">
+          <thead class="thead-blue">
+            <tr>
+              <th>ID</th>
+              <th>LINK POSTER</th>
+              <th>Poster no.</th>
+              <th>feedback 1</th>
+              <th>feedback 2</th>
+              <th>Remark</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{range .Posters}}
+            <tr>
+              <td>{{.ID}}</td>
+              <td><a href="{{.Link_Poster}}" target="_blank">View Poster</a></td>
+              <td>{{.Poster_number}}</td>
+              <td class="truncate-cell" title="{{.Note1}}">{{.Note1}}</td>
+              <td class="truncate-cell" title="{{.Note2}}">{{.Note2}}</td>
+              <td class="truncate-cell" title="{{.Remark}}">{{.Remark}}</td>
+            </tr>
+            {{end}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Poster Review Form -->
+    <div class="card p-4 mt-4">
+      <h4 class="mb-3">Poster Review</h4>
+      <form id="posterForm" action="/updateposter" method="POST">
+        <div class="form-group">
+          <label for="posterID">Poster ID:</label>
+          <input type="text" id="posterID" name="id" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+          <label for="posterNumber">Poster Choose No.:</label>
+          <input type="text" id="posterNumber" name="poster_number" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+          <label for="note1">ATTY.:</label>
+          <textarea id="note1" name="note1" class="form-control" rows="3" placeholder="Type feedback here..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="note2">Sir Regie:</label>
+          <textarea id="note2" name="note2" class="form-control" rows="3" placeholder="Type feedback here..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="remark">Remark:</label>
+          <select id="remark" name="remark" class="form-control" required>
+            <option value="">-- Select Remark --</option>
+            <option value="POSTER ARE PENDING" style="color: rgb(255, 155, 5);">POSTER ARE PENDING</option>
+            <option value="APPROVE POSTER" style="color: rgb(71, 212, 0);">APPROVE POSTER</option>
+            <option value="REVISION POSTER" style="color: rgb(222, 6, 6);">REVISION POSTER</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">SUBMIT</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="/js/sidebar.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
+<script src="/js/datatable.js"></script>
+</body>
+</html>
+{{end}}

@@ -1,0 +1,48 @@
+{{define "/logout"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/x-icon" href="/css/image/icon.png">
+  <meta charset="UTF-8">
+  <title>Logout Confirmation</title>
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <link rel="stylesheet" type="text/css" href="/css/logout.css">
+</head>
+<script type="text/javascript">
+    function preventBack() { window.history.forward(); }
+    setTimeout("preventBack()", 0);
+    window.onunload = function () { null; };
+</script>
+<body>
+
+  <!-- Animated background shapes -->
+  <div class="background">
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+
+  <!-- Logout form -->
+  <form id="logoutForm" action="/logoutprocess" method="POST">
+    <div class="confirm-box" id="confirmBox">
+ <script src="https://cdn.lordicon.com/lordicon.js"></script>
+<lord-icon
+    src="https://cdn.lordicon.com/vfiwitrm.json"
+    trigger="hover"
+    stroke="bold"
+    colors="primary:#f80c0c,secondary:#f80c0c"
+    style="width:90px;height:90px">
+</lord-icon>
+      <h2>Are you sure you want to logout?</h2>
+      <div class="buttons">
+        <button type="button" class="yes" onclick="submitWithAnimation()">Yes</button>
+        <button type="button" class="cancel" onclick="cancelLogout()">Cancel</button>
+      </div>
+      <div class="spinner" id="spinner"></div>
+    </div>
+  </form>
+
+  <script src="/js/logout.js"></script>
+  </script>
+
+</body>
+</html>
+{{end}}

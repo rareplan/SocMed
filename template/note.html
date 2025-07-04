@@ -1,0 +1,65 @@
+{{define "/note"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/x-icon" href="/css/image/icon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/sidebar.css">
+</head>
+<body>
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <img src="/css/image/dash.png" alt="dash" class="dash" >
+           <div class="list-group list-group-flush">
+              <a href="/home" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-home me-2"></i> Home</a>
+            {{if .IsAdmin}}
+              <a href="/useraccess" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-clipboard-user me-2"></i> User Access</a>
+              <a href="/allposter" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-image me-2"></i> Poster</a>
+              <a href="/allposterchecker" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-clipboard-check me-2"></i> Approval Hub</a>
+            {{end}}
+
+            {{if .IsUser}}
+              <a href="/allposter" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-image me-2"></i> Poster</a>
+            {{end}}
+
+            {{if .IsChecker}}
+              <a href="/allposterchecker" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-clipboard-check me-2"></i> Approval Hub</a>
+            {{end}}
+                <a href="#calendarSubmenu" class="list-group-item list-group-item-action bg-dark text-white" data-toggle="collapse" aria-expanded="false">
+                <i class="fas fa-layer-group"></i> My Space<i class="fas fa-caret-down float-right"></i></a>
+            <div class="collapse" id="calendarSubmenu">
+                <a href="/calendar" class="list-group-item list-group-item-action bg-secondary text-white pl-5">
+                <i class="fas fa-calendar-alt me-2"></i> Content Calendar</a>
+                <a href="/note" class="list-group-item list-group-item-action bg-secondary text-white pl-5">
+                <i class="fas fa-sticky-note me-2"></i> Note</a>
+                <a href="/game" class="list-group-item list-group-item-action bg-secondary text-white pl-5">
+                <i class="fas fa-gamepad me-2"></i> Games</a>
+            </div>
+              <a href="/logout" class="list-group-item list-group-item-action bg-dark " style="color: rgb(255, 35, 35);"><i class="fas fa-sign-out-alt me-2" style="color: rgb(255, 35, 35);"></i> Logout</a>
+            </div>
+        </div>
+        <!-- Page Content -->
+  <div id="page-content-wrapper" class="container-fluid p-4">
+    <button class="btn btn-primary mb-3" id="menu-toggle">☰ Sidebar</button>
+
+            <!-- canva design embed -->
+         <div style="position: relative; width: 100%; height: 0; padding-top: 56.2225%;
+                 padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden;border-radius: 8px; will-change: transform;">
+            <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
+                src="https://www.canva.com/design/DAGr-zniBnk/hw3dBwInLEUq9uBer6SQOg/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen"></iframe>
+        </div>
+            <a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAGr-zniBnk&#x2F;hw3dBwInLEUq9uBer6SQOg&#x2F;view?utm_content=DAGr-zniBnk&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener"></a> 
+    </div>
+    <script src="/js/sidebar.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>   
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.4.4/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+</body>
+</html>
+{{end}}

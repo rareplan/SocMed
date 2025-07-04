@@ -1,0 +1,29 @@
+.atn {
+  background-color: hwb(124 21% 34%);
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 4px;
+  width: fit-content;
+ 
+}
+
+.atn:hover {
+  background-color: rgb(15, 101, 25);  
+  color: white;
+}
+
+.border1 {
+
+  border-radius: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem !important;
+  width: 100%;
+
+}
+
+
+
+    

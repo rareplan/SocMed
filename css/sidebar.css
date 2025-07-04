@@ -1,0 +1,73 @@
+body {
+    background-color: #f8f9fa;
+}
+#sidebar-wrapper {
+    position: fixed;
+    height: 100%;
+    width: 250px;
+    background: #343a40;
+    padding-top: 20px;
+    transition: all 0.3s;
+    left: -250px;
+}
+#wrapper.toggled #sidebar-wrapper {
+    left: 0;
+}
+#page-content-wrapper {
+    margin-left: 0;
+    transition: all 0.3s;
+    width: 100%;
+}
+#wrapper.toggled #page-content-wrapper {
+    margin-left: 250px;
+}
+.sidebar-heading {
+    font-size: 1.5rem;
+    text-align: center;
+    padding-bottom: 20px;
+    font-weight: bold;
+}
+.list-group-item {
+    border: none;
+    transition: 0.3s;
+}
+.list-group-item:hover {
+    background: #051591;
+}
+.btn-primary {
+    border-radius: 5px;
+}
+.table th {
+    background: #007bff;
+    color: white;
+}
+.card {
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dash {
+ max-width: 150px;
+  width: 100%;
+  height: auto;
+  margin-top: -10px;
+  margin-bottom: 5px;
+ margin-left: 50px;
+}
+
+
+#modalIDText {
+      font-weight: bold;
+      color: #069c15;
+      margin-left: 1%;
+      background-color: #ffffff;
+      font-size: medium;
+    
+    }
+    #modalLink {
+      color: #ec1e1e;
+      margin-left: 1%;
+   
+    }
+
+  

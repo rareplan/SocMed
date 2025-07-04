@@ -1,0 +1,88 @@
+  body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: linear-gradient(135deg, #6e00ff, #9c27b0);
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      color: white;
+    }
+
+    .confetti {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .text-container {
+      z-index: 2;
+      text-align: center;
+      opacity: 0;
+      animation: fadeText 1.5s ease-in-out forwards;
+    }
+
+    .text-container h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      animation: fadeText 1.5s ease-in-out forwards;
+    }
+
+    .text-container p {
+      font-size: 1.5rem;
+      animation: fadeText 2.5s ease-in-out forwards;
+    }
+
+    .back-btn {
+      margin-top: 2rem;
+      padding: 12px 25px;
+      font-size: 1rem;
+      background: white;
+      color: #6e00ff;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease, background 0.3s ease;
+    }
+
+    .back-btn:hover {
+      background: #e0e0e0;
+      transform: scale(1.05);
+    }
+
+    @keyframes fadeText {
+      0% {
+        opacity: 0;
+        transform: translateY(30px);
+        filter: blur(5px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+      }
+    }
+
+    .square {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: red;
+      animation: floatSquare 10s linear infinite;
+      opacity: 0.8;
+    }
+
+    @keyframes floatSquare {
+      0% {
+        transform: translateY(0) rotate(0deg);
+      }
+      100% {
+        transform: translateY(100vh) rotate(720deg);
+      }
+    }
