@@ -13,7 +13,7 @@ import (
 
 func InitializeDatabase() *sql.DB {
 	// Database connection details
-	connStr := "host=localhost port=5432 user=postgres password=replan dbname=replan sslmode=disable"
+	connStr := "host=localhost port=5432 user=replan_user password=sh76SsHL2y75VVh6nnzhKlcUS0NSQ9Kx dbname=replan sslmode=require"
 
 	// Open database connection
 	db, err := sql.Open("postgres", connStr)
@@ -47,7 +47,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	password := r.FormValue("password") // Use `password` if plain-text; `password_hash` if already hashed
 
-	connStr := "host=localhost port=5432 user=postgres password=replan dbname=replan sslmode=disable"
+	connStr :="host=localhost port=5432 user=replan_user password=sh76SsHL2y75VVh6nnzhKlcUS0NSQ9Kx dbname=replan sslmode=require"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		http.Error(w, "Database connection error", http.StatusInternalServerError)
