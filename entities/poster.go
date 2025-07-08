@@ -23,7 +23,7 @@ type Poster struct {
 // AllPoster retrieves all posters from the database//
 func AllPoster() ([]Poster, error) {
 	// PostgreSQL connection
-	connStr := "user=postgres password=replan dbname=replan sslmode=disable"
+	connStr := "user=replan_user password=sh76SsHL2y75VVh6nnzhKlcUS0NSQ9Kx dbname=replan sslmode=require"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Println(err)
@@ -146,7 +146,7 @@ func InsertPosterHandle(w http.ResponseWriter, r *http.Request) {
 	remark := ""
 
 	// PostgreSQL connection
-	connStr := "user=postgres password=replan dbname=replan sslmode=disable"
+	connStr := "user=replan_user password=sh76SsHL2y75VVh6nnzhKlcUS0NSQ9Kx dbname=replan sslmode=require"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		http.Error(w, "Database connection error", http.StatusInternalServerError)
@@ -179,7 +179,7 @@ func DeletePosterHandle(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 
 	// PostgreSQL connection
-	connStr := "user=postgres password=replan dbname=replan sslmode=disable"
+	connStr := "user=replan_user password=sh76SsHL2y75VVh6nnzhKlcUS0NSQ9Kx dbname=replan sslmode=require"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		http.Error(w, "Database connection error", http.StatusInternalServerError)
@@ -222,7 +222,7 @@ func UpdateLinkHandle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	connStr := "user=postgres password=replan dbname=replan sslmode=disable"
+	connStr := "user=replan_user password=sh76SsHL2y75VVh6nnzhKlcUS0NSQ9Kx dbname=replan sslmode=require"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Println("DB error:", err)
