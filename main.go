@@ -31,7 +31,7 @@ func main() {
 	//////////// para sa HTML DISPLAY //////////////////////////////////////
 
 	mux.HandleFunc("/login", index.Login)
-	mux.HandleFunc("/sample", index.Sample)
+	mux.HandleFunc("/insert", index.Insert)
 	mux.HandleFunc("/invalidlogin", index.Invalidlogin)
 	mux.HandleFunc("/welcome", entities.AuthMiddleware([]string{"admin", "checker", "user"}, index.Welcome))
 	mux.HandleFunc("/home", entities.AuthMiddleware([]string{"admin", "checker", "user"}, entities.Dashboard))
@@ -59,6 +59,7 @@ func main() {
 	mux.HandleFunc("/deleteuser", entities.DeleteUser)
 	mux.HandleFunc("/insertuser", entities.InsertUser)
 	mux.HandleFunc("/updateuser", entities.UpdateUser)
+	mux.HandleFunc("/inseruser", entities.InsertUserHandle)
 
 	if err := http.ListenAndServe(":"+port, mux); err != nil {
 		panic(err)

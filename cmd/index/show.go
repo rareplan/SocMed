@@ -35,11 +35,11 @@ func AddPoster(w http.ResponseWriter, r *http.Request) {
 	config.TPL.ExecuteTemplate(w, "/addposter", nil)
 }
 
-func Sample(w http.ResponseWriter, r *http.Request) {
-	config.TPL.ExecuteTemplate(w, "/sample", nil)
-}
-
 func Welcome(w http.ResponseWriter, r *http.Request) {
 	config.TPL.ExecuteTemplate(w, "/welcome", nil)
 
+}
+
+func Insert(w http.ResponseWriter, r *http.Request) {
+	config.TPL.ExecuteTemplate(w, "/insert", nil)
 }
