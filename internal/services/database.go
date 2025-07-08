@@ -11,8 +11,7 @@ import (
 
 func Services() {
 	// Database connection details
-	connStr := "host=localhost port=5432 user=replan_user password=sh76SsHL2y75VVh6nnzhKlcUS0NSQ9Kx dbname=replan sslmode=require"
-
+	connStr := "host=dpg-d1m6l83ipnbc73fs0isg-a port=5432 user=replan_user password=sh76SsHL2y75VVh6nnzhKlcUS0NSQ9Kx dbname=replan sslmode=require"
 	// Open database connection
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
