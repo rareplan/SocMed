@@ -12,12 +12,8 @@ import (
 )
 
 func InitializeDatabase() *sql.DB {
-	// Database connection details
 	// Uncomment the following line to use a local database connection
-	//connStr := "host=localhost port=5432 user=postgres password=replan dbname=replan sslmode=disable"
-
-	// Use your actual connection string here
-	connStr := "host=dpg-d1m6l83ipnbc73fs0isg-a port=5432 user=replan_user password=sh76SsHL2y75VVh6nnzhKlcUS0NSQ9Kx dbname=replan sslmode=require"
+	connStr := "host=localhost port=5432 user=postgres password=replan dbname=replan sslmode=disable"
 
 	// Open database connection
 	db, err := sql.Open("postgres", connStr)
@@ -51,11 +47,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	password := r.FormValue("password") // Use `password` if plain-text; `password_hash` if already hashed
 
-	// Uncomment the following line to use a local database connection
-	//connStr := "host=localhost port=5432 user=postgres password=replan dbname=replan sslmode=disable"
-
-	// Use your actual connection string here
-	connStr := "host=dpg-d1m6l83ipnbc73fs0isg-a port=5432 user=replan_user password=sh76SsHL2y75VVh6nnzhKlcUS0NSQ9Kx dbname=replan sslmode=require"
+	connStr := "host=localhost port=5432 user=postgres password=replan dbname=replan sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		http.Error(w, "Database connection error", http.StatusInternalServerError)

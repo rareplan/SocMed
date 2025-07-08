@@ -13,7 +13,7 @@ var (
 func init() {
 
 	var err error
-	TPL, err = template.New("/").Funcs(fm).ParseGlob("template/*.html")
+	TPL, err = template.New("").Funcs(fm).ParseGlob("template/*.html")
 	if err != nil {
 		log.Fatalf("failed to parse templates: %v", err)
 	}
