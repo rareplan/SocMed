@@ -12,7 +12,7 @@ import (
 func Services() {
 	// Database connection details
 	//connStr := "host=localhost port=5432 user=postgres password=replan dbname=replan sslmode=disable"
-	connStr := "host=dpg-d1md11mmcj7s73a5qt50-a port=5432 user=replan_icjw_user password=klOhlKiWtnpI3vK14rkoMkgP9Sw2MUwR dbname=replan_icjw sslmode=require"
+	connStr := "dpg-d1n2fkuuk2gs739eu39g-a.oregon-postgres.render.com port=5432 user=replan_sz89_user password=xkMmzaTtoqm9NouEyVaXWMZGgsdamovb dbname=replan_sz89 sslmode=require"
 	// Open database connection
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {

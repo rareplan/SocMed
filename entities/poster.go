@@ -24,7 +24,7 @@ type Poster struct {
 func AllPoster() ([]Poster, error) {
 	// PostgreSQL connection
 	//connStr := "user=postgres password=replan dbname=replan sslmode=disable"
-	connStr := "host=dpg-d1md11mmcj7s73a5qt50-a port=5432 user=replan_icjw_user password=klOhlKiWtnpI3vK14rkoMkgP9Sw2MUwR dbname=replan_icjw sslmode=require"
+	connStr := "dpg-d1n2fkuuk2gs739eu39g-a.oregon-postgres.render.com port=5432 user=replan_sz89_user password=xkMmzaTtoqm9NouEyVaXWMZGgsdamovb dbname=replan_sz89 sslmode=require"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Println(err)
@@ -69,7 +69,7 @@ func UpdatePosterHandle(w http.ResponseWriter, r *http.Request) {
 	remark := r.FormValue("remark")
 
 	//connStr := "user=postgres password=replan dbname=replan sslmode=disable"
-	connStr := "host=dpg-d1md11mmcj7s73a5qt50-a port=5432 user=replan_icjw_user password=klOhlKiWtnpI3vK14rkoMkgP9Sw2MUwR dbname=replan_icjw sslmode=require"
+	connStr := "dpg-d1n2fkuuk2gs739eu39g-a.oregon-postgres.render.com port=5432 user=replan_sz89_user password=xkMmzaTtoqm9NouEyVaXWMZGgsdamovb dbname=replan_sz89 sslmode=require"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		http.Error(w, "Database connection error", http.StatusInternalServerError)
@@ -149,7 +149,7 @@ func InsertPosterHandle(w http.ResponseWriter, r *http.Request) {
 
 	// PostgreSQL connection
 	//connStr := "user=postgres password=replan dbname=replan sslmode=disable"
-	connStr := "host=dpg-d1md11mmcj7s73a5qt50-a port=5432 user=replan_icjw_user password=klOhlKiWtnpI3vK14rkoMkgP9Sw2MUwR dbname=replan_icjw sslmode=require"
+	connStr := "dpg-d1n2fkuuk2gs739eu39g-a.oregon-postgres.render.com port=5432 user=replan_sz89_user password=xkMmzaTtoqm9NouEyVaXWMZGgsdamovb dbname=replan_sz89 sslmode=require"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		http.Error(w, "Database connection error", http.StatusInternalServerError)
@@ -183,7 +183,7 @@ func DeletePosterHandle(w http.ResponseWriter, r *http.Request) {
 
 	// PostgreSQL connection
 	//connStr := "user=postgres password=replan dbname=replan sslmode=disable"
-	connStr := "host=dpg-d1md11mmcj7s73a5qt50-a port=5432 user=replan_icjw_user password=klOhlKiWtnpI3vK14rkoMkgP9Sw2MUwR dbname=replan_icjw sslmode=require"
+	connStr := "dpg-d1n2fkuuk2gs739eu39g-a.oregon-postgres.render.com port=5432 user=replan_sz89_user password=xkMmzaTtoqm9NouEyVaXWMZGgsdamovb dbname=replan_sz89 sslmode=require"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		http.Error(w, "Database connection error", http.StatusInternalServerError)
@@ -227,7 +227,7 @@ func UpdateLinkHandle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//connStr := "user=postgres password=replan dbname=replan sslmode=disable"
-	connStr := "host=dpg-d1md11mmcj7s73a5qt50-a port=5432 user=replan_icjw_user password=klOhlKiWtnpI3vK14rkoMkgP9Sw2MUwR dbname=replan_icjw sslmode=require"
+	connStr := "dpg-d1n2fkuuk2gs739eu39g-a.oregon-postgres.render.com port=5432 user=replan_sz89_user password=xkMmzaTtoqm9NouEyVaXWMZGgsdamovb dbname=replan_sz89 sslmode=require"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Println("DB error:", err)

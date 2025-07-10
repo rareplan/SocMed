@@ -14,8 +14,7 @@ import (
 func InitializeDatabase() *sql.DB {
 	// Uncomment the following line to use a local database connection
 	//connStr := "host=localhost port=5432 user=postgres password=replan dbname=replan sslmode=disable"
-	connStr := "host=dpg-d1md11mmcj7s73a5qt50-a port=5432 user=replan_icjw_user password=klOhlKiWtnpI3vK14rkoMkgP9Sw2MUwR dbname=replan_icjw sslmode=require"
-
+	connStr := "dpg-d1n2fkuuk2gs739eu39g-a.oregon-postgres.render.com port=5432 user=replan_sz89_user password=xkMmzaTtoqm9NouEyVaXWMZGgsdamovb dbname=replan_sz89 sslmode=require"
 	// Open database connection
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
@@ -49,7 +48,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	password := r.FormValue("password") // Use `password` if plain-text; `password_hash` if already hashed
 
 	//connStr := "host=localhost port=5432 user=postgres password=replan dbname=replan sslmode=disable"
-	connStr := "host=dpg-d1md11mmcj7s73a5qt50-a port=5432 user=replan_icjw_user password=klOhlKiWtnpI3vK14rkoMkgP9Sw2MUwR dbname=replan_icjw sslmode=require"
+	connStr := "dpg-d1n2fkuuk2gs739eu39g-a.oregon-postgres.render.com port=5432 user=replan_sz89_user password=xkMmzaTtoqm9NouEyVaXWMZGgsdamovb dbname=replan_sz89 sslmode=require"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		http.Error(w, "Database connection error", http.StatusInternalServerError)
