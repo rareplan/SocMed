@@ -40,6 +40,6 @@ func Welcome(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func Insert(w http.ResponseWriter, r *http.Request) {
-	config.TPL.ExecuteTemplate(w, "/insert", nil)
+func AlreadyLog(w http.ResponseWriter, r *http.Request) {
+	config.TPL.ExecuteTemplate(w, "/alreadylog", nil)
 }

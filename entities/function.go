@@ -2,6 +2,7 @@ package entities
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"myproject/temp/config"
 	"net/http"
@@ -11,6 +12,14 @@ import (
 	_ "github.com/lib/pq"
 )
 
+type SessionData struct {
+	Role     string
+	LoggedIn bool
+}
+
+var sessions = map[string]SessionData{}
+
+// //////////////////////////////////////////// INITIALIZE DATABASE CONNECTION //////////////////////////////////////
 func InitializeDatabase() *sql.DB {
 	// Uncomment the following line to use a local database connection
 	//connStr := "host=localhost port=5432 user=postgres password=replan dbname=replan sslmode=disable"
@@ -31,13 +40,7 @@ func InitializeDatabase() *sql.DB {
 	return db
 }
 
-type SessionData struct {
-	Role string
-}
-
-var sessions = map[string]SessionData{}
-
-// PARA MAG LOGIN //
+// ///////////////////////////////////////////////////////////// LOGIN HANDLER //////////////////////////////////////////////////////
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -45,9 +48,9 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	username := r.FormValue("username")
-	password := r.FormValue("password") // Use `password` if plain-text; `password_hash` if already hashed
+	password := r.FormValue("password")
 
-	//connStr := "host=localhost port=5432 user=postgres password=replan dbname=replan sslmode=disable"
+	// Database connection
 	connStr := "host=dpg-d1n2fkuuk2gs739eu39g-a.oregon-postgres.render.com port=5432 user=replan_sz89_user password=xkMmzaTtoqm9NouEyVaXWMZGgsdamovb dbname=replan_sz89 sslmode=require"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
@@ -56,6 +59,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer db.Close()
 
+	// Get role from DB
 	var role string
 	err = db.QueryRow(`SELECT role FROM users WHERE username=$1 AND password_hash=$2`, username, password).Scan(&role)
 	if err != nil {
@@ -63,12 +67,21 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	role = strings.ToLower(strings.TrimSpace(role)) // Always clean role
+	// ✅ Check if user is already logged in
+	if session, exists := sessions[username]; exists && session.LoggedIn {
+		fmt.Println("Already logged in:", username) // for debugging
+		http.Redirect(w, r, "/alreadylog", http.StatusSeeOther)
+		return
+	}
 
-	// ✅ Save to session
-	sessions[username] = SessionData{Role: role}
+	// ✅ Clean role, save to session map
+	role = strings.ToLower(strings.TrimSpace(role))
+	sessions[username] = SessionData{
+		Role:     role,
+		LoggedIn: true,
+	}
 
-	// ✅ Set cookie
+	// ✅ Set auth cookie
 	http.SetCookie(w, &http.Cookie{
 		Name:     "auth_token",
 		Value:    username,
@@ -80,8 +93,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/welcome", http.StatusSeeOther)
 }
 
-// PARA HINDI BASTA BASTA PAMASOK KAHIT COPY ANG LINK//
-
+// ///////////////////////////////////////////////////////// AUTHENTICATION MIDDLEWARE //////////////////////////////////////////////////////
 func AuthMiddleware(allowedRoles []string, next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("auth_token")
@@ -107,7 +119,7 @@ func AuthMiddleware(allowedRoles []string, next http.HandlerFunc) http.HandlerFu
 	}
 }
 
-// PARA SA DISPLAY DASHBOARD KASAMA ANG SESSION ROLE //
+// /////////////////////////////////////////////////////////// DASHBOARD HANDLER //////////////////////////////////////////////////////
 func Dashboard(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("auth_token")
 	if err != nil {
@@ -140,14 +152,26 @@ func Dashboard(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// PARA SA LOGOUT NG SESSION //
+// ///////////////////////////////////////////////////////////// LOGOUT HANDLER //////////////////////////////////////////////////////
 func logoutProcessHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	// Remove cookie
+	// Get the auth_token cookie
+	cookie, err := r.Cookie("auth_token")
+	if err == nil {
+		username := cookie.Value
+
+		// Unset session status
+		if session, exists := sessions[username]; exists {
+			session.LoggedIn = false
+			sessions[username] = session
+		}
+	}
+
+	// Clear the cookie
 	http.SetCookie(w, &http.Cookie{
 		Name:     "auth_token",
 		Value:    "",
@@ -160,7 +184,7 @@ func logoutProcessHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 
-// PARA SA VIEW YUNG CALENDAR //
+// ///////////////////////////////////////////////////////////// CALENDAR HANDLER //////////////////////////////////////////////////////
 func Calendar(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("auth_token")
 	if err != nil {
@@ -193,6 +217,7 @@ func Calendar(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// ///////////////////////////////////////////////////////////// NOTE HANDLER //////////////////////////////////////////////////////
 func Note(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("auth_token")
 	if err != nil {
@@ -225,6 +250,7 @@ func Note(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// ///////////////////////////////////////////////////////////// ACTIVITY HANDLER //////////////////////////////////////////////////////
 func Act(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("auth_token")
 	if err != nil {

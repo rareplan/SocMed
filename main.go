@@ -31,7 +31,7 @@ func main() {
 	//////////// para sa HTML DISPLAY //////////////////////////////////////
 
 	mux.HandleFunc("/login", index.Login)
-	mux.HandleFunc("/insert", index.Insert)
+	mux.HandleFunc("/alreadylog", index.AlreadyLog)
 	mux.HandleFunc("/invalidlogin", index.Invalidlogin)
 	mux.HandleFunc("/welcome", entities.AuthMiddleware([]string{"admin", "checker", "user"}, index.Welcome))
 	mux.HandleFunc("/home", entities.AuthMiddleware([]string{"admin", "checker", "user"}, entities.Dashboard))
@@ -43,7 +43,7 @@ func main() {
 	mux.HandleFunc("/success", entities.AuthMiddleware([]string{"admin", "checker"}, index.Success))
 	mux.HandleFunc("/addposter", entities.AuthMiddleware([]string{"admin", "user"}, index.AddPoster))
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		http.Redirect(w, r, "/alreadylog", http.StatusSeeOther)
 	})
 
 	//////////// Para sa function at database connection //////////////////////////////////////

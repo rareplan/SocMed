@@ -9,6 +9,7 @@ import (
 	_ "github.com/mattn/go-sqlite3" // Replace with your actual SQL driver
 )
 
+// // User struct represents a user entity in the database.
 type User struct {
 	ID       string `json:"id"`
 	Username string `json:"username"`
@@ -16,6 +17,7 @@ type User struct {
 	Role     string `json:"role"`
 }
 
+// AllUsers retrieves all users from the database.//
 func AllUsers() ([]User, error) {
 	//connStr := "user=postgres password=replan dbname=replan sslmode=disable"
 	connStr := "host=dpg-d1n2fkuuk2gs739eu39g-a.oregon-postgres.render.com port=5432 user=replan_sz89_user password=xkMmzaTtoqm9NouEyVaXWMZGgsdamovb dbname=replan_sz89 sslmode=require"
@@ -88,6 +90,7 @@ func DeleteUserHandle(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/useraccess", http.StatusSeeOther)
 }
 
+// InsertUserHandle handles the insertion of a new user into the database.//
 func InsertUserHandle(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST method allowed", http.StatusMethodNotAllowed)
@@ -123,6 +126,7 @@ func InsertUserHandle(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/useraccess", http.StatusSeeOther)
 }
 
+// UpdateUserHandle handles the update of an existing user in the database.//
 func UpdateUserHandle(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST method allowed", http.StatusMethodNotAllowed)
@@ -177,6 +181,7 @@ func UpdateUserHandle(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/useraccess", http.StatusSeeOther)
 }
 
+// InsertData handles the insertion of a new user into the database via a form submission.//
 func InsertData(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST method allowed", http.StatusMethodNotAllowed)

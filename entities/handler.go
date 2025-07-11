@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-// / PARA SA LOGIN FUNCTION ////
+// ///////// LOGIN HANDLER //////////
 func LoginProcess(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
@@ -17,7 +17,7 @@ func LoginProcess(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// / PARA SA LOGOUT FUNCTION ////
+// //// PARA SA LOGOUT PROCESS //////
 func LogoutProcess(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
@@ -28,7 +28,7 @@ func LogoutProcess(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// ///// PARA SA UPDATE POSTER //////
+// //// PARA SA UPDATE POSTER //////
 func UpdatePoster(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "POST" {
@@ -40,7 +40,7 @@ func UpdatePoster(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// /// PARA MAG UPDATE NG LINK
+// ///// PARA SA UPDATE LINK //////
 func UpdateLink(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "POST" {
@@ -64,7 +64,7 @@ func InsertPoster(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// PARA SA DELETE ANG DATA //
+// //// PARA SA DELETE POSTER //////
 func DeletePoster(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "POST" {
@@ -76,7 +76,7 @@ func DeletePoster(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// // PARA SA USER POSTER //////
+// //// PARA SA GET POSTER //////
 func GetPoster(w http.ResponseWriter, r *http.Request) {
 	// ✅ 1. Check for session via cookie
 	cookie, err := r.Cookie("auth_token")
@@ -120,8 +120,7 @@ func GetPoster(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// ///// PARA SA CHECKER POSTER //////
-
+// ////// PARA SA GET POSTER CHECKER //////
 func GetPostercChecker(w http.ResponseWriter, r *http.Request) {
 	// ✅ 1. Check for session via cookie
 	cookie, err := r.Cookie("auth_token")
@@ -165,6 +164,7 @@ func GetPostercChecker(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// ///// PARA SA USER ACCESS //////
 func UserAccess(w http.ResponseWriter, r *http.Request) {
 	// ✅ 1. Check for session via cookie
 	cookie, err := r.Cookie("auth_token")
@@ -232,7 +232,7 @@ func InsertUser(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// /// PARA SA UPDATE USER //////
+// //// PARA SA UPDATE USER //////
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "POST" {
