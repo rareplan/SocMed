@@ -42,7 +42,7 @@ func main() {
 	mux.HandleFunc("/success", entities.AuthMiddleware([]string{"admin", "verifier"}, index.Success))
 	mux.HandleFunc("/addposter", entities.AuthMiddleware([]string{"admin", "designer"}, index.AddPoster))
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/alreadylog", http.StatusSeeOther)
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
 	})
 
 	//////////// Para sa function at database connection //////////////////////////////////////

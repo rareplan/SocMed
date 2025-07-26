@@ -42,61 +42,61 @@ func InitializeDatabase() *sql.DB {
 
 // ///////////////////////////////////////////////////////////// LOGIN HANDLER //////////////////////////////////////////////////////
 func loginHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+	if r.Method == http.MethodGet {
+
+		// Render login page (HTML form)
+		http.ServeFile(w, r, "/login")
 		return
 	}
 
-	username := r.FormValue("username")
-	password := r.FormValue("password")
+	if r.Method == http.MethodPost {
+		username := r.FormValue("username")
+		password := r.FormValue("password")
 
-	// PostgreSQL connection
-	connStr := "host=dpg-d1n2fkuuk2gs739eu39g-a.oregon-postgres.render.com port=5432 user=replan_sz89_user password=xkMmzaTtoqm9NouEyVaXWMZGgsdamovb dbname=replan_sz89 sslmode=require"
-	db, err := sql.Open("postgres", connStr)
-	if err != nil {
-		http.Error(w, "Database error", http.StatusInternalServerError)
-		return
-	}
-	defer db.Close()
+		// PostgreSQL connection
+		connStr := "host=dpg-d1n2fkuuk2gs739eu39g-a.oregon-postgres.render.com port=5432 user=replan_sz89_user password=xkMmzaTtoqm9NouEyVaXWMZGgsdamovb dbname=replan_sz89 sslmode=require"
+		db, err := sql.Open("postgres", connStr)
+		if err != nil {
+			http.Error(w, "Database error", http.StatusInternalServerError)
+			return
+		}
+		defer db.Close()
 
-	// Get user role
-	var role string
-	err = db.QueryRow(`SELECT role FROM users WHERE username=$1 AND password_hash=$2`, username, password).Scan(&role)
-	if err != nil {
-		http.Redirect(w, r, "/invalidlogin", http.StatusSeeOther)
-		return
-	}
+		var role string
+		err = db.QueryRow(`SELECT role FROM users WHERE username=$1 AND password_hash=$2`, username, password).Scan(&role)
+		if err != nil {
+			http.Redirect(w, r, "/invalidlogin", http.StatusSeeOther)
+			return
+		}
 
-	// Check for existing cookie
-	cookie, err := r.Cookie("auth_token")
-	if err == nil {
-		oldUser := cookie.Value
-		// Check if session expired
-		if session, ok := sessions[oldUser]; ok && time.Now().After(session.Expiry) {
-			delete(sessions, oldUser)
-		} else if ok && session.LoggedIn {
+		// Check if user is already logged in somewhere else
+		if session, ok := sessions[username]; ok && session.LoggedIn && time.Now().Before(session.Expiry) {
 			http.Redirect(w, r, "/alreadylog", http.StatusSeeOther)
 			return
 		}
+
+		// Store new session
+		sessions[username] = SessionData{
+			Role:     strings.ToLower(strings.TrimSpace(role)),
+			LoggedIn: true,
+			Expiry:   time.Now().Add(30 * time.Minute),
+		}
+
+		// Set cookie
+		http.SetCookie(w, &http.Cookie{
+			Name:     "auth_token",
+			Value:    username,
+			Path:     "/",
+			HttpOnly: true,
+			Expires:  time.Now().Add(30 * time.Minute),
+		})
+
+		http.Redirect(w, r, "/welcome", http.StatusSeeOther)
+		return
 	}
 
-	// Store new session
-	sessions[username] = SessionData{
-		Role:     strings.ToLower(strings.TrimSpace(role)),
-		LoggedIn: true,
-		Expiry:   time.Now().Add(30 * time.Minute),
-	}
-
-	// Set cookie
-	http.SetCookie(w, &http.Cookie{
-		Name:     "auth_token",
-		Value:    username,
-		Path:     "/",
-		HttpOnly: true,
-		Expires:  time.Now().Add(30 * time.Minute),
-	})
-
-	http.Redirect(w, r, "/welcome", http.StatusSeeOther)
+	// Other methods not allowed
+	http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 }
 
 // //////////////////////////////////////////////////////// AUTHENTICATION MIDDLEWARE //////////////////////////////////////////////////////
