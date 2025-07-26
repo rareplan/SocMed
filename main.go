@@ -29,7 +29,6 @@ func main() {
 	mux.Handle("/json-browse/", http.StripPrefix("/json-browse", http.FileServer(http.Dir("json-browse"))))
 
 	//////////// para sa HTML DISPLAY //////////////////////////////////////
-
 	mux.HandleFunc("/login", index.Login)
 	mux.HandleFunc("/alreadylog", index.AlreadyLog)
 	mux.HandleFunc("/invalidlogin", index.Invalidlogin)
