@@ -1,8 +1,8 @@
 package entities
 
 import (
+	"bytes"
 	"database/sql"
-	"fmt"
 	"log"
 	"myproject/temp/config"
 	"net/http"
@@ -15,6 +15,7 @@ import (
 type SessionData struct {
 	Role     string
 	LoggedIn bool
+	Expiry   time.Time
 }
 
 var sessions = map[string]SessionData{}
@@ -24,7 +25,6 @@ func InitializeDatabase() *sql.DB {
 	// Uncomment the following line to use a local database connection
 	//connStr := "host=localhost port=5432 user=postgres password=replan dbname=replan sslmode=disable"
 	connStr := "host=dpg-d1n2fkuuk2gs739eu39g-a.oregon-postgres.render.com port=5432 user=replan_sz89_user password=xkMmzaTtoqm9NouEyVaXWMZGgsdamovb dbname=replan_sz89 sslmode=require"
-	// Open database connection
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal("Error opening database:", err)
@@ -50,16 +50,16 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 
-	// Database connection
+	// PostgreSQL connection
 	connStr := "host=dpg-d1n2fkuuk2gs739eu39g-a.oregon-postgres.render.com port=5432 user=replan_sz89_user password=xkMmzaTtoqm9NouEyVaXWMZGgsdamovb dbname=replan_sz89 sslmode=require"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
-		http.Error(w, "Database connection error", http.StatusInternalServerError)
+		http.Error(w, "Database error", http.StatusInternalServerError)
 		return
 	}
 	defer db.Close()
 
-	// Get role from DB
+	// Get user role
 	var role string
 	err = db.QueryRow(`SELECT role FROM users WHERE username=$1 AND password_hash=$2`, username, password).Scan(&role)
 	if err != nil {
@@ -67,33 +67,39 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// ✅ Check if user is already logged in
-	if session, exists := sessions[username]; exists && session.LoggedIn {
-		fmt.Println("Already logged in:", username) // for debugging
-		http.Redirect(w, r, "/alreadylog", http.StatusSeeOther)
-		return
+	// Check for existing cookie
+	cookie, err := r.Cookie("auth_token")
+	if err == nil {
+		oldUser := cookie.Value
+		// Check if session expired
+		if session, ok := sessions[oldUser]; ok && time.Now().After(session.Expiry) {
+			delete(sessions, oldUser)
+		} else if ok && session.LoggedIn {
+			http.Redirect(w, r, "/alreadylog", http.StatusSeeOther)
+			return
+		}
 	}
 
-	// ✅ Clean role, save to session map
-	role = strings.ToLower(strings.TrimSpace(role))
+	// Store new session
 	sessions[username] = SessionData{
-		Role:     role,
+		Role:     strings.ToLower(strings.TrimSpace(role)),
 		LoggedIn: true,
+		Expiry:   time.Now().Add(30 * time.Minute),
 	}
 
-	// ✅ Set auth cookie
+	// Set cookie
 	http.SetCookie(w, &http.Cookie{
 		Name:     "auth_token",
 		Value:    username,
 		Path:     "/",
 		HttpOnly: true,
-		Expires:  time.Now().Add(60 * time.Minute),
+		Expires:  time.Now().Add(30 * time.Minute),
 	})
 
 	http.Redirect(w, r, "/welcome", http.StatusSeeOther)
 }
 
-// ///////////////////////////////////////////////////////// AUTHENTICATION MIDDLEWARE //////////////////////////////////////////////////////
+// //////////////////////////////////////////////////////// AUTHENTICATION MIDDLEWARE //////////////////////////////////////////////////////
 func AuthMiddleware(allowedRoles []string, next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("auth_token")
@@ -134,22 +140,26 @@ func Dashboard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Role flags for template
 	data := struct {
-		IsAdmin   bool
-		IsUser    bool
-		IsChecker bool
+		IsAdmin    bool
+		IsDesigner bool
+		IsVerifier bool
+		Role       string
 	}{
-		IsAdmin:   session.Role == "admin",
-		IsUser:    session.Role == "user",
-		IsChecker: session.Role == "checker",
+		IsAdmin:    session.Role == "admin",
+		IsDesigner: session.Role == "designer",
+		IsVerifier: session.Role == "verifier",
+		Role:       session.Role,
 	}
 
-	err = config.TPL.ExecuteTemplate(w, "/home", data)
-
+	var tplOutput bytes.Buffer
+	err = config.TPL.ExecuteTemplate(&tplOutput, "home", data)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Template rendering error", http.StatusInternalServerError)
+		return
 	}
+
+	tplOutput.WriteTo(w)
 }
 
 // ///////////////////////////////////////////////////////////// LOGOUT HANDLER //////////////////////////////////////////////////////
@@ -199,22 +209,26 @@ func Calendar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Role flags for template
 	data := struct {
-		IsAdmin   bool
-		IsUser    bool
-		IsChecker bool
+		IsAdmin    bool
+		IsDesigner bool
+		IsVerifier bool
+		Role       string
 	}{
-		IsAdmin:   session.Role == "admin",
-		IsUser:    session.Role == "user",
-		IsChecker: session.Role == "checker",
+		IsAdmin:    session.Role == "admin",
+		IsDesigner: session.Role == "designer",
+		IsVerifier: session.Role == "verifier",
+		Role:       session.Role,
 	}
 
-	err = config.TPL.ExecuteTemplate(w, "/calendar", data)
-
+	var tplOutput bytes.Buffer
+	err = config.TPL.ExecuteTemplate(&tplOutput, "calendar", data)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Template rendering error", http.StatusInternalServerError)
+		return
 	}
+
+	tplOutput.WriteTo(w)
 }
 
 // ///////////////////////////////////////////////////////////// NOTE HANDLER //////////////////////////////////////////////////////
@@ -232,22 +246,26 @@ func Note(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Role flags for template
 	data := struct {
-		IsAdmin   bool
-		IsUser    bool
-		IsChecker bool
+		IsAdmin    bool
+		IsDesigner bool
+		IsVerifier bool
+		Role       string
 	}{
-		IsAdmin:   session.Role == "admin",
-		IsUser:    session.Role == "user",
-		IsChecker: session.Role == "checker",
+		IsAdmin:    session.Role == "admin",
+		IsDesigner: session.Role == "designer",
+		IsVerifier: session.Role == "verifier",
+		Role:       session.Role,
 	}
 
-	err = config.TPL.ExecuteTemplate(w, "/note", data)
-
+	var tplOutput bytes.Buffer
+	err = config.TPL.ExecuteTemplate(&tplOutput, "note", data)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Template rendering error", http.StatusInternalServerError)
+		return
 	}
+
+	tplOutput.WriteTo(w)
 }
 
 // ///////////////////////////////////////////////////////////// ACTIVITY HANDLER //////////////////////////////////////////////////////
@@ -265,20 +283,24 @@ func Act(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Role flags for template
 	data := struct {
-		IsAdmin   bool
-		IsUser    bool
-		IsChecker bool
+		IsAdmin    bool
+		IsDesigner bool
+		IsVerifier bool
+		Role       string
 	}{
-		IsAdmin:   session.Role == "admin",
-		IsUser:    session.Role == "user",
-		IsChecker: session.Role == "checker",
+		IsAdmin:    session.Role == "admin",
+		IsDesigner: session.Role == "designer",
+		IsVerifier: session.Role == "verifier",
+		Role:       session.Role,
 	}
 
-	err = config.TPL.ExecuteTemplate(w, "/activity", data)
-
+	var tplOutput bytes.Buffer
+	err = config.TPL.ExecuteTemplate(&tplOutput, "activity", data)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Template rendering error", http.StatusInternalServerError)
+		return
 	}
+
+	tplOutput.WriteTo(w)
 }

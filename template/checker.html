@@ -1,20 +1,19 @@
-{{define "/allchecker"}}
+{{define "allchecker"}}
 <!DOCTYPE html>
 <html>
 <head>
   <link rel="icon" type="image/x-icon" href="/css/image/icon.png">
   <title>Approval Hub</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css">
   <link rel="stylesheet" type="text/css" href="/css/sidebar.css">
   <link rel="stylesheet" type="text/css" href="/css/checker.css">
+  <link rel="stylesheet" type="text/css" href="/css/feedback2.css">
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
-
 <body>
 <div class="d-flex" id="wrapper">
   <!-- Sidebar -->
@@ -28,11 +27,11 @@
         <a href="/allposterchecker" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-clipboard-check me-2"></i> Approval Hub</a>
       {{end}}
 
-      {{if .IsUser}}
+      {{if .IsDesigner}}
         <a href="/allposter" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-image me-2"></i> Poster</a>
       {{end}}
 
-      {{if .IsChecker}}
+      {{if .IsVerifier}}
         <a href="/allposterchecker" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-clipboard-check me-2"></i> Approval Hub</a>
       {{end}}
 
@@ -50,13 +49,17 @@
 
       <a href="/logout" class="list-group-item list-group-item-action bg-dark " style="color: rgb(255, 35, 35);">
         <i class="fas fa-sign-out-alt me-2" style="color: rgb(255, 35, 35);"></i> Logout</a>
+       <div class="user-role">
+             <i class="fas fa-user-circle person-icon icon-person"></i>
+             <span class="role-label">{{.Role}}</span>
+          </div>
     </div>
   </div>
 
   <!-- Page Content -->
   <div id="page-content-wrapper" class="container-fluid p-4">
     <button class="btn btn-primary mb-3" id="menu-toggle">☰ Sidebar</button>
-    
+
     <!-- Posters Table -->
     <div class="card p-4">
       <h4 class="mb-3">Posters Table</h4>
@@ -66,9 +69,7 @@
             <tr>
               <th>ID</th>
               <th>LINK POSTER</th>
-              <th>Poster no.</th>
-              <th>feedback 1</th>
-              <th>feedback 2</th>
+              <th>feedback</th>
               <th>Remark</th>
             </tr>
           </thead>
@@ -77,10 +78,8 @@
             <tr>
               <td>{{.ID}}</td>
               <td><a href="{{.Link_Poster}}" target="_blank">View Poster</a></td>
-              <td>{{.Poster_number}}</td>
-              <td class="truncate-cell" title="{{.Note1}}">{{.Note1}}</td>
-              <td class="truncate-cell" title="{{.Note2}}">{{.Note2}}</td>
-              <td class="truncate-cell" title="{{.Remark}}">{{.Remark}}</td>
+              <td class="truncate-cell" data-fulltext="{{.Note1}}">{{.Note1}}</td>
+              <td>{{.Remark}}</td>
             </tr>
             {{end}}
           </tbody>
@@ -98,27 +97,16 @@
         </div>
 
         <div class="form-group">
-          <label for="posterNumber">Poster Choose No.:</label>
-          <input type="text" id="posterNumber" name="poster_number" class="form-control" required>
-        </div>
-
-        <div class="form-group">
-          <label for="note1">Feedback 1:</label>
+          <label for="note1">Comment</label>
           <textarea id="note1" name="note1" class="form-control" rows="3" placeholder="Type feedback here..."></textarea>
         </div>
-
-        <div class="form-group">
-          <label for="note2">Feedback 2:</label>
-          <textarea id="note2" name="note2" class="form-control" rows="3" placeholder="Type feedback here..."></textarea>
-        </div>
-
         <div class="form-group">
           <label for="remark">Remark:</label>
           <select id="remark" name="remark" class="form-control" required>
             <option value="">-- Select Remark --</option>
-            <option value="POSTER ARE PENDING" style="color: rgb(255, 155, 5);">POSTER ARE PENDING</option>
-            <option value="APPROVE POSTER" style="color: rgb(71, 212, 0);">APPROVE POSTER</option>
-            <option value="REVISION POSTER" style="color: rgb(222, 6, 6);">REVISION POSTER</option>
+            <option value="POSTER ARE PENDING">POSTER ARE PENDING</option>
+            <option value="APPROVE POSTER">APPROVE POSTER</option>
+            <option value="REVISION POSTER">REVISION POSTER</option>
           </select>
         </div>
 
@@ -132,6 +120,7 @@
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
 <script src="/js/datatable.js"></script>
+<script src="/js/feedback2.js"></script>
 </body>
 </html>
 {{end}}

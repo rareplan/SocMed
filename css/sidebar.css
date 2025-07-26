@@ -26,6 +26,7 @@ body {
     text-align: center;
     padding-bottom: 20px;
     font-weight: bold;
+    position: relative;
 }
 .list-group-item {
     border: none;
@@ -70,4 +71,34 @@ body {
    
     }
 
-  
+.user-role {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 5px 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  margin-bottom:5px;
+  background: linear-gradient(to right, #007bff, #343a40);
+}
+
+.person-icon {
+  margin-left:15%;
+  font-size: 20px; /* adjust size as needed */
+  margin-right: 8px; /* spacing between icon and text */
+  margin-top:5px
+    
+}
+
+.role-label {
+  font-size: 15px;
+  font-family: Arial, sans-serif;
+  text-transform: capitalize;
+  margin-right:50px;
+  margin-top:6px
+}
+
+
+

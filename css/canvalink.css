@@ -1,0 +1,15 @@
+
+        .calendar-box {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .calendar-box h4 {
+            font-weight: 600;
+            margin-bottom: 20px;
+        }

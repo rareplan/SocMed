@@ -1,0 +1,22 @@
+ .border1 {
+      border-radius: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem !important;
+      width: 100%;
+    }
+
+    /* Modal animation */
+    .modal.fade .modal-dialog {
+      transform: translateY(-50px);
+      transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+      opacity: 0;
+    }
+
+    .modal.fade.show .modal-dialog {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .modal.fade {
+      transition: opacity 0.4s ease-in-out;
+    }

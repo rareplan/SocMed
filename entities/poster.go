@@ -3,9 +3,10 @@ package entities
 import (
 	"database/sql"
 	"log"
-
 	"net/http"
+	"strconv"
 	"strings"
+	"time"
 
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3" // Replace with your actual SQL driver
@@ -13,12 +14,10 @@ import (
 
 // /// Poster struct represents a poster entity in the database.///
 type Poster struct {
-	ID            string `json:"id"`
-	Link_Poster   string `json:"link_poster"`
-	Poster_number string `json:"poster_number"`
-	Note1         string `json:"note1"`
-	Note2         string `json:"note2"`
-	Remark        string `json:"remark"`
+	ID          string `json:"id"`
+	Link_Poster string `json:"link_poster"`
+	Note1       string `json:"note1"`
+	Remark      string `json:"remark"`
 }
 
 // AllPoster retrieves all posters from the database.
@@ -33,7 +32,7 @@ func AllPoster() ([]Poster, error) {
 	}
 	defer db.Close()
 
-	rows, err := db.Query("Select id, link_poster, poster_number, note1, note2, remark from poster;")
+	rows, err := db.Query("Select id, link_poster, note1, remark from poster;")
 	if err != nil {
 
 		log.Println(err)
@@ -44,7 +43,7 @@ func AllPoster() ([]Poster, error) {
 	m := make([]Poster, 0)
 	for rows.Next() {
 		ml := Poster{}
-		err := rows.Scan(&ml.ID, &ml.Link_Poster, &ml.Poster_number, &ml.Note1, &ml.Note2, &ml.Remark)
+		err := rows.Scan(&ml.ID, &ml.Link_Poster, &ml.Note1, &ml.Remark)
 		if err != nil {
 			return nil, err
 		}
@@ -63,13 +62,16 @@ func UpdatePosterHandle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := r.FormValue("id")
-	posterNumber := r.FormValue("poster_number")
-	note1 := r.FormValue("note1")
-	note2 := r.FormValue("note2")
+	idStr := r.FormValue("id")
+	newNote1 := r.FormValue("note1")
 	remark := r.FormValue("remark")
 
-	//connStr := "user=postgres password=replan dbname=replan sslmode=disable"
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Redirect(w, r, "/invalid", http.StatusSeeOther)
+		return
+	}
+
 	connStr := "host=dpg-d1n2fkuuk2gs739eu39g-a.oregon-postgres.render.com port=5432 user=replan_sz89_user password=xkMmzaTtoqm9NouEyVaXWMZGgsdamovb dbname=replan_sz89 sslmode=require"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
@@ -78,40 +80,44 @@ func UpdatePosterHandle(w http.ResponseWriter, r *http.Request) {
 	}
 	defer db.Close()
 
-	// Get existing note1 and note2
-	var existingNote1, existingNote2 string
-	err = db.QueryRow("SELECT note1, note2 FROM poster WHERE id = $1", id).Scan(&existingNote1, &existingNote2)
-	if err != nil {
+	// Get existing notes
+	var existingNote1 string
+	err = db.QueryRow("SELECT note1 FROM poster WHERE id = $1", id).Scan(&existingNote1)
+	if err == sql.ErrNoRows {
+		http.Redirect(w, r, "/invalid", http.StatusSeeOther)
+		return
+	} else if err != nil {
 		http.Error(w, "Failed to fetch existing notes: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// Clean remark input
-	cleanRemark := remark
-	if cleanRemark != "" {
-		cleanRemark = strings.TrimSpace(cleanRemark)
-	}
+	cleanRemark := strings.TrimSpace(remark)
 
-	// If remark is "Approve Poster" (case-insensitive), clear notes
+	// Get current timestamp in 12-hour format with AM/PM
+	timestamp := time.Now().Format("01-02-2006 03:04:05 PM")
+
+	// Check for "Approve Poster"
 	if strings.EqualFold(cleanRemark, "Approve Poster") {
-		note1 = ""
-		note2 = ""
+		existingNote1 = ""
 	} else {
-		// Retain existing notes if no new input
-		if note1 == "" {
-			note1 = existingNote1
+		// Append new note to note1 if present
+		if newNote1 != "" {
+			noteWithTime := "[" + timestamp + "] " + newNote1
+			if existingNote1 != "" {
+				existingNote1 += "\n\n" + noteWithTime
+			} else {
+				existingNote1 = noteWithTime
+			}
 		}
-		if note2 == "" {
-			note2 = existingNote2
-		}
+
 	}
 
-	// Update record
+	// Update database
 	result, err := db.Exec(`
 		UPDATE poster
-		SET poster_number = $1, note1 = $2, note2 = $3, remark = $4
-		WHERE id = $5
-	`, posterNumber, note1, note2, cleanRemark, id)
+		SET note1 = $1, remark = $2
+		WHERE id = $3
+	`, existingNote1, cleanRemark, id)
 
 	if err != nil {
 		http.Error(w, "Failed to update poster: "+err.Error(), http.StatusInternalServerError)
@@ -143,9 +149,7 @@ func InsertPosterHandle(w http.ResponseWriter, r *http.Request) {
 	link_poster := r.FormValue("link_poster")
 
 	// Default values for NOT NULL fields
-	poster_number := ""
 	note1 := ""
-	note2 := ""
 	remark := ""
 
 	// PostgreSQL connection
@@ -160,11 +164,11 @@ func InsertPosterHandle(w http.ResponseWriter, r *http.Request) {
 
 	// Insert query
 	query := `
-		INSERT INTO poster (id, link_poster, poster_number, note1, note2, remark)
-		VALUES ($1, $2, $3, $4, $5, $6)
+		INSERT INTO poster (id, link_poster, note1, remark)
+		VALUES ($1, $2, $3, $4)
 	`
 
-	_, err = db.Exec(query, id, link_poster, poster_number, note1, note2, remark)
+	_, err = db.Exec(query, id, link_poster, note1, remark)
 	if err != nil {
 		http.Error(w, "Insert failed: "+err.Error(), http.StatusInternalServerError)
 		return

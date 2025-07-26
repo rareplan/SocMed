@@ -1,4 +1,4 @@
-{{define "/user"}}
+{{define "user"}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,30 +9,7 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" type="text/css" href="/css/sidebar.css">
-  <style>
-    .border1 {
-      border-radius: 20px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      padding: 1.5rem !important;
-      width: 100%;
-    }
-
-    /* Modal animation */
-    .modal.fade .modal-dialog {
-      transform: translateY(-50px);
-      transition: transform 0.4s ease-out, opacity 0.4s ease-out;
-      opacity: 0;
-    }
-
-    .modal.fade.show .modal-dialog {
-      transform: translateY(0);
-      opacity: 1;
-    }
-
-    .modal.fade {
-      transition: opacity 0.4s ease-in-out;
-    }
-  </style>
+  <link rel="stylesheet" type="text/css" href="/css/user.css">
 </head>
 <body>
 <div class="d-flex" id="wrapper">
@@ -47,10 +24,10 @@
       <a href="/allposter" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-image me-2"></i> Poster</a>
       <a href="/allposterchecker" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-clipboard-check me-2"></i> Approval Hub</a>
       {{end}}
-      {{if .IsUser}}
+      {{if .IsDesigner}}
       <a href="/allposter" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-image me-2"></i> Poster</a>
       {{end}}
-      {{if .IsChecker}}
+      {{if .IsVerifier}}
       <a href="/allposterchecker" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-clipboard-check me-2"></i> Approval Hub</a>
       {{end}}
       <a href="#calendarSubmenu" class="list-group-item list-group-item-action bg-dark text-white" data-toggle="collapse" aria-expanded="false">
@@ -65,6 +42,10 @@
       </div>
       <a href="/logout" class="list-group-item list-group-item-action bg-dark" style="color: rgb(255, 35, 35);">
         <i class="fas fa-sign-out-alt me-2" style="color: rgb(255, 35, 35);"></i> Logout</a>
+         <div class="user-role">
+             <i class="fas fa-user-circle person-icon icon-person"></i>
+             <span class="role-label">{{.Role}}</span>
+          </div>
     </div>
   </div>
 
@@ -185,8 +166,8 @@
           <label for="addRole">Role</label>
           <select class="form-control" name="role" id="addRole" required>
             <option value="admin">Admin</option>
-            <option value="user">User</option>
-            <option value="checker">Checker</option>
+            <option value="designer">Designer</option>
+            <option value="verifier">Verifier</option>
           </select>
         </div>
       </div>

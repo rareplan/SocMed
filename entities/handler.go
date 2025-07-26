@@ -1,7 +1,7 @@
 package entities
 
 import (
-	"log"
+	"bytes"
 	"myproject/temp/config"
 	"net/http"
 )
@@ -101,23 +101,27 @@ func GetPoster(w http.ResponseWriter, r *http.Request) {
 
 	// ✅ 3. Combine role flags + posters for template
 	data := struct {
-		IsAdmin   bool
-		IsUser    bool
-		IsChecker bool
-		Posters   any
+		IsAdmin    bool
+		IsDesigner bool
+		IsVerifier bool
+		Role       string
+		Posters    any
 	}{
-		IsAdmin:   session.Role == "admin",
-		IsUser:    session.Role == "user",
-		IsChecker: session.Role == "checker",
-		Posters:   posters,
+		IsAdmin:    session.Role == "admin",
+		IsDesigner: session.Role == "designer",
+		IsVerifier: session.Role == "verifier",
+		Role:       session.Role,
+		Posters:    posters,
 	}
 
+	var tplOutput bytes.Buffer
 	// ✅ 4. Render correct template name
-	err = config.TPL.ExecuteTemplate(w, "/poster", data)
+	err = config.TPL.ExecuteTemplate(w, "poster", data)
 	if err != nil {
-		log.Println("Template error:", err)
+		http.Error(w, "Template rendering error", http.StatusInternalServerError)
 		return
 	}
+	tplOutput.WriteTo(w)
 }
 
 // ////// PARA SA GET POSTER CHECKER //////
@@ -145,23 +149,27 @@ func GetPostercChecker(w http.ResponseWriter, r *http.Request) {
 
 	// ✅ 3. Combine role flags + posters for template
 	data := struct {
-		IsAdmin   bool
-		IsUser    bool
-		IsChecker bool
-		Posters   any
+		IsAdmin    bool
+		IsDesigner bool
+		IsVerifier bool
+		Role       string
+		Posters    any
 	}{
-		IsAdmin:   session.Role == "admin",
-		IsUser:    session.Role == "user",
-		IsChecker: session.Role == "checker",
-		Posters:   posters,
+		IsAdmin:    session.Role == "admin",
+		IsDesigner: session.Role == "designer",
+		IsVerifier: session.Role == "verifier",
+		Role:       session.Role,
+		Posters:    posters,
 	}
 
 	// ✅ 4. Render correct template name
-	err = config.TPL.ExecuteTemplate(w, "/allchecker", data)
+	var tplOutput bytes.Buffer
+	err = config.TPL.ExecuteTemplate(w, "allchecker", data)
 	if err != nil {
-		log.Println("Template error:", err)
+		http.Error(w, "Template rendering error", http.StatusInternalServerError)
 		return
 	}
+	tplOutput.WriteTo(w)
 }
 
 // ///// PARA SA USER ACCESS //////
@@ -189,23 +197,27 @@ func UserAccess(w http.ResponseWriter, r *http.Request) {
 
 	// ✅ 3. Combine role flags + posters for template
 	data := struct {
-		IsAdmin   bool
-		IsUser    bool
-		IsChecker bool
-		Users     any
+		IsAdmin    bool
+		IsDesigner bool
+		IsVerifier bool
+		Role       string
+		Users      any
 	}{
-		IsAdmin:   session.Role == "admin",
-		IsUser:    session.Role == "user",
-		IsChecker: session.Role == "checker",
-		Users:     users,
+		IsAdmin:    session.Role == "admin",
+		IsDesigner: session.Role == "designer",
+		IsVerifier: session.Role == "verifier",
+		Role:       session.Role,
+		Users:      users,
 	}
 
 	// ✅ 4. Render correct template name
-	err = config.TPL.ExecuteTemplate(w, "/user", data)
+	var tplOutput bytes.Buffer
+	err = config.TPL.ExecuteTemplate(w, "user", data)
 	if err != nil {
-		log.Println("Template error:", err)
+		http.Error(w, "Template rendering error", http.StatusInternalServerError)
 		return
 	}
+	tplOutput.WriteTo(w)
 }
 
 // /// PARA SA DELETE USER //////
