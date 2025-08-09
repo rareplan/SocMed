@@ -23,8 +23,8 @@ var sessions = map[string]SessionData{}
 // //////////////////////////////////////////// INITIALIZE DATABASE CONNECTION //////////////////////////////////////
 func InitializeDatabase() *sql.DB {
 	// Uncomment the following line to use a local database connection
-	//connStr := "host=localhost port=5432 user=postgres password=replan dbname=replan sslmode=disable"
-	connStr := "host=dpg-d1n2fkuuk2gs739eu39g-a.oregon-postgres.render.com port=5432 user=replan_sz89_user password=xkMmzaTtoqm9NouEyVaXWMZGgsdamovb dbname=replan_sz89 sslmode=require"
+	connStr := "host=localhost port=5432 user=postgres password=replan dbname=replan sslmode=disable"
+	//connStr := "host=dpg-d1n2fkuuk2gs739eu39g-a.oregon-postgres.render.com port=5432 user=replan_sz89_user password=xkMmzaTtoqm9NouEyVaXWMZGgsdamovb dbname=replan_sz89 sslmode=require"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal("Error opening database:", err)
@@ -54,7 +54,9 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		password := r.FormValue("password")
 
 		// PostgreSQL connection
-		connStr := "host=dpg-d1n2fkuuk2gs739eu39g-a.oregon-postgres.render.com port=5432 user=replan_sz89_user password=xkMmzaTtoqm9NouEyVaXWMZGgsdamovb dbname=replan_sz89 sslmode=require"
+		connStr := "host=localhost port=5432 user=postgres password=replan dbname=replan sslmode=disable"
+		// Live Connection
+		//connStr := "host=dpg-d1n2fkuuk2gs739eu39g-a.oregon-postgres.render.com port=5432 user=replan_sz89_user password=xkMmzaTtoqm9NouEyVaXWMZGgsdamovb dbname=replan_sz89 sslmode=require"
 		db, err := sql.Open("postgres", connStr)
 		if err != nil {
 			http.Error(w, "Database error", http.StatusInternalServerError)
@@ -268,7 +270,7 @@ func Note(w http.ResponseWriter, r *http.Request) {
 	tplOutput.WriteTo(w)
 }
 
-// ///////////////////////////////////////////////////////////// ACTIVITY HANDLER //////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////// ACTIVITY HANDLER //////////////////////////////////////////////////////
 func Act(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("auth_token")
 	if err != nil {

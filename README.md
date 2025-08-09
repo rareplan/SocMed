@@ -26,7 +26,7 @@
 ## 🛠 Built With
 
 - **Backend**: [Go (Golang)](https://golang.org/)
-- **Frontend**: HTML5, CSS3, Vanilla JS
+- **Frontend**: HTML5, CSS3, JS
 - **Database**: [PostgreSQL](https://www.postgresql.org/)
 
 

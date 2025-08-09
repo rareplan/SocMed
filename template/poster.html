@@ -62,9 +62,10 @@
                     <tr>
                         <th>ID</th>
                         <th>LINK POSTER</th>
-                        <th>feedback</th>
-                        <th>Remark</th>
-                        <th>Action</th>
+                        <th>FEEDBACK</th>
+                        <th>SCEENSHOT</th>
+                        <th>REMARK</th>
+                        <th>ACTION</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -73,6 +74,13 @@
                         <td>{{.ID}}</td>
                         <td><a href="{{.Link_Poster}}" target="_blank">View Poster</a></td>
                         <td class="truncate-cell" data-fulltext="{{.Note1}}">{{.Note1}}</td>
+                        <td>
+                        {{if .Image_data}}
+                        <a href="/image/{{.ID}}" target="_blank">View Screenshot</a>
+                        {{else}}
+                        <span class="text-muted">No image</span>
+                        {{end}}
+                        </td>
                         <td>{{.Remark}}</td>
                         <td>
                             <form action="/deleteposter" method="POST" style="display:inline;">

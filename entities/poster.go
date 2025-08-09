@@ -2,6 +2,7 @@ package entities
 
 import (
 	"database/sql"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -17,14 +18,16 @@ type Poster struct {
 	ID          string `json:"id"`
 	Link_Poster string `json:"link_poster"`
 	Note1       string `json:"note1"`
+	Image_data  []byte `json:"image_data"` // Optional field for image data
 	Remark      string `json:"remark"`
 }
 
 // AllPoster retrieves all posters from the database.
 func AllPoster() ([]Poster, error) {
 	// PostgreSQL connection
-	//connStr := "user=postgres password=replan dbname=replan sslmode=disable"
-	connStr := "host=dpg-d1n2fkuuk2gs739eu39g-a.oregon-postgres.render.com port=5432 user=replan_sz89_user password=xkMmzaTtoqm9NouEyVaXWMZGgsdamovb dbname=replan_sz89 sslmode=require"
+	connStr := "user=postgres password=replan dbname=replan sslmode=disable"
+	// Live Connection
+	//connStr := "host=dpg-d1n2fkuuk2gs739eu39g-a.oregon-postgres.render.com port=5432 user=replan_sz89_user password=xkMmzaTtoqm9NouEyVaXWMZGgsdamovb dbname=replan_sz89 sslmode=require"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Println(err)
@@ -32,7 +35,7 @@ func AllPoster() ([]Poster, error) {
 	}
 	defer db.Close()
 
-	rows, err := db.Query("Select id, link_poster, note1, remark from poster;")
+	rows, err := db.Query("Select id, link_poster, note1, image_data, remark from poster;")
 	if err != nil {
 
 		log.Println(err)
@@ -43,7 +46,7 @@ func AllPoster() ([]Poster, error) {
 	m := make([]Poster, 0)
 	for rows.Next() {
 		ml := Poster{}
-		err := rows.Scan(&ml.ID, &ml.Link_Poster, &ml.Note1, &ml.Remark)
+		err := rows.Scan(&ml.ID, &ml.Link_Poster, &ml.Note1, &ml.Image_data, &ml.Remark)
 		if err != nil {
 			return nil, err
 		}
@@ -66,13 +69,29 @@ func UpdatePosterHandle(w http.ResponseWriter, r *http.Request) {
 	newNote1 := r.FormValue("note1")
 	remark := r.FormValue("remark")
 
+	// ====== Read uploaded image ======
+	file, _, err := r.FormFile("image_data")
+	var imageBytes []byte
+	if err != nil && err != http.ErrMissingFile {
+		http.Error(w, "Failed to read image: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+	if file != nil {
+		defer file.Close()
+		imageBytes, err = io.ReadAll(file)
+		if err != nil {
+			http.Error(w, "Failed to read image content: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		http.Redirect(w, r, "/invalid", http.StatusSeeOther)
 		return
 	}
 
-	connStr := "host=dpg-d1n2fkuuk2gs739eu39g-a.oregon-postgres.render.com port=5432 user=replan_sz89_user password=xkMmzaTtoqm9NouEyVaXWMZGgsdamovb dbname=replan_sz89 sslmode=require"
+	connStr := "host=localhost port=5432 user=postgres password=replan dbname=replan sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		http.Error(w, "Database connection error", http.StatusInternalServerError)
@@ -92,15 +111,11 @@ func UpdatePosterHandle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cleanRemark := strings.TrimSpace(remark)
-
-	// Get current timestamp in 12-hour format with AM/PM
 	timestamp := time.Now().Format("01-02-2006 03:04:05 PM")
 
-	// Check for "Approve Poster"
 	if strings.EqualFold(cleanRemark, "Approve Poster") {
 		existingNote1 = ""
 	} else {
-		// Append new note to note1 if present
 		if newNote1 != "" {
 			noteWithTime := "[" + timestamp + "] " + newNote1
 			if existingNote1 != "" {
@@ -109,29 +124,27 @@ func UpdatePosterHandle(w http.ResponseWriter, r *http.Request) {
 				existingNote1 = noteWithTime
 			}
 		}
-
 	}
 
-	// Update database
-	result, err := db.Exec(`
-		UPDATE poster
-		SET note1 = $1, remark = $2
-		WHERE id = $3
-	`, existingNote1, cleanRemark, id)
+	// ====== Update with image ======
+	if len(imageBytes) > 0 {
+		// If may in-upload na bagong image
+		_, err = db.Exec(`
+			UPDATE poster
+			SET note1 = $1, remark = $2, image_data = $3
+			WHERE id = $4
+		`, existingNote1, cleanRemark, imageBytes, id)
+	} else {
+		// Kung walang bagong image, huwag i-overwrite image_data
+		_, err = db.Exec(`
+			UPDATE poster
+			SET note1 = $1, remark = $2
+			WHERE id = $3
+		`, existingNote1, cleanRemark, id)
+	}
 
 	if err != nil {
 		http.Error(w, "Failed to update poster: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		http.Error(w, "Error checking update result: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	if rowsAffected == 0 {
-		http.Redirect(w, r, "/invalid", http.StatusSeeOther)
 		return
 	}
 
@@ -153,8 +166,9 @@ func InsertPosterHandle(w http.ResponseWriter, r *http.Request) {
 	remark := ""
 
 	// PostgreSQL connection
-	//connStr := "user=postgres password=replan dbname=replan sslmode=disable"
-	connStr := "host=dpg-d1n2fkuuk2gs739eu39g-a.oregon-postgres.render.com port=5432 user=replan_sz89_user password=xkMmzaTtoqm9NouEyVaXWMZGgsdamovb dbname=replan_sz89 sslmode=require"
+	connStr := "user=postgres password=replan dbname=replan sslmode=disable"
+	// Live Connection
+	//connStr := "host=dpg-d1n2fkuuk2gs739eu39g-a.oregon-postgres.render.com port=5432 user=replan_sz89_user password=xkMmzaTtoqm9NouEyVaXWMZGgsdamovb dbname=replan_sz89 sslmode=require"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		http.Error(w, "Database connection error", http.StatusInternalServerError)
@@ -187,8 +201,9 @@ func DeletePosterHandle(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 
 	// PostgreSQL connection
-	//connStr := "user=postgres password=replan dbname=replan sslmode=disable"
-	connStr := "host=dpg-d1n2fkuuk2gs739eu39g-a.oregon-postgres.render.com port=5432 user=replan_sz89_user password=xkMmzaTtoqm9NouEyVaXWMZGgsdamovb dbname=replan_sz89 sslmode=require"
+	connStr := "user=postgres password=replan dbname=replan sslmode=disable"
+	// Live Connection
+	//connStr := "host=dpg-d1n2fkuuk2gs739eu39g-a.oregon-postgres.render.com port=5432 user=replan_sz89_user password=xkMmzaTtoqm9NouEyVaXWMZGgsdamovb dbname=replan_sz89 sslmode=require"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		http.Error(w, "Database connection error", http.StatusInternalServerError)
@@ -231,9 +246,10 @@ func UpdateLinkHandle(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/allposter", http.StatusSeeOther)
 		return
 	}
-
-	//connStr := "user=postgres password=replan dbname=replan sslmode=disable"
-	connStr := "host=dpg-d1n2fkuuk2gs739eu39g-a.oregon-postgres.render.com port=5432 user=replan_sz89_user password=xkMmzaTtoqm9NouEyVaXWMZGgsdamovb dbname=replan_sz89 sslmode=require"
+	// PostgreSQL connection
+	connStr := "user=postgres password=replan dbname=replan sslmode=disable"
+	// Live Connection
+	//connStr := "host=dpg-d1n2fkuuk2gs739eu39g-a.oregon-postgres.render.com port=5432 user=replan_sz89_user password=xkMmzaTtoqm9NouEyVaXWMZGgsdamovb dbname=replan_sz89 sslmode=require"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Println("DB error:", err)
@@ -248,4 +264,31 @@ func UpdateLinkHandle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/allposter", http.StatusSeeOther)
+}
+
+func ServeImage(w http.ResponseWriter, r *http.Request) {
+	idStr := strings.TrimPrefix(r.URL.Path, "/image/")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Invalid image ID", http.StatusBadRequest)
+		return
+	}
+
+	db, err := sql.Open("postgres", "host=localhost port=5432 user=postgres password=replan dbname=replan sslmode=disable")
+	if err != nil {
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
+	}
+	defer db.Close()
+
+	var imageData []byte
+	err = db.QueryRow("SELECT image_data FROM poster WHERE id = $1", id).Scan(&imageData)
+	if err != nil {
+		http.Error(w, "Image not found", http.StatusNotFound)
+		return
+	}
+
+	contentType := http.DetectContentType(imageData)
+	w.Header().Set("Content-Type", contentType)
+	w.Write(imageData)
 }

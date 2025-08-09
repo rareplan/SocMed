@@ -59,6 +59,7 @@ func main() {
 	mux.HandleFunc("/insertuser", entities.InsertUser)
 	mux.HandleFunc("/updateuser", entities.UpdateUser)
 	mux.HandleFunc("/inseruser", entities.InsertUserHandle)
+	mux.HandleFunc("/image/", entities.ServeImage)
 
 	if err := http.ListenAndServe(":"+port, mux); err != nil {
 		panic(err)

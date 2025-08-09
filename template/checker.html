@@ -1,6 +1,6 @@
 {{define "allchecker"}}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <link rel="icon" type="image/x-icon" href="/css/image/icon.png">
   <title>Approval Hub</title>
@@ -58,7 +58,7 @@
 
   <!-- Page Content -->
   <div id="page-content-wrapper" class="container-fluid p-4">
-    <button class="btn btn-primary mb-3" id="menu-toggle">☰ Sidebar</button>
+  <button class="btn btn-primary mb-3" id="menu-toggle">☰ Sidebar</button>
 
     <!-- Posters Table -->
     <div class="card p-4">
@@ -69,8 +69,9 @@
             <tr>
               <th>ID</th>
               <th>LINK POSTER</th>
-              <th>feedback</th>
-              <th>Remark</th>
+              <th>FEEDBACK</th>
+              <th>SCEENSHOT</th>
+              <th>REMARK</th>
             </tr>
           </thead>
           <tbody>
@@ -79,6 +80,13 @@
               <td>{{.ID}}</td>
               <td><a href="{{.Link_Poster}}" target="_blank">View Poster</a></td>
               <td class="truncate-cell" data-fulltext="{{.Note1}}">{{.Note1}}</td>
+              <td>
+              {{if .Image_data}}
+              <a href="/image/{{.ID}}" target="_blank">View Screenshot</a>
+              {{else}}
+              <span class="text-muted">No image</span>
+              {{end}}
+              </td>
               <td>{{.Remark}}</td>
             </tr>
             {{end}}
@@ -90,7 +98,7 @@
     <!-- Poster Review Form -->
     <div class="card p-4 mt-4">
       <h4 class="mb-3">Poster Review</h4>
-      <form id="posterForm" action="/updateposter" method="POST">
+      <form id="posterForm" action="/updateposter" method="POST" enctype="multipart/form-data">
         <div class="form-group">
           <label for="posterID">Poster ID:</label>
           <input type="text" id="posterID" name="id" class="form-control" required>
@@ -100,6 +108,7 @@
           <label for="note1">Comment</label>
           <textarea id="note1" name="note1" class="form-control" rows="3" placeholder="Type feedback here..."></textarea>
         </div>
+
         <div class="form-group">
           <label for="remark">Remark:</label>
           <select id="remark" name="remark" class="form-control" required>
@@ -110,6 +119,13 @@
           </select>
         </div>
 
+        <!-- File Upload Section -->
+        <div class="form-group">
+          <label for="screenshot">Upload Screenshot:</label>
+            <label class="custom-file-upload mt-1">
+            <input type="file" id="image_data" name="image_data" />
+          </label>
+        </div>
         <button type="submit" class="btn btn-primary">SUBMIT</button>
       </form>
     </div>
