@@ -113,6 +113,7 @@ func UpdatePosterHandle(w http.ResponseWriter, r *http.Request) {
 	cleanRemark := strings.TrimSpace(remark)
 	timestamp := time.Now().Format("01-02-2006 03:04:05 PM")
 
+	// Update note logic
 	if strings.EqualFold(cleanRemark, "Approve Poster") {
 		existingNote1 = ""
 	} else {
@@ -126,21 +127,21 @@ func UpdatePosterHandle(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// ====== Update with image ======
+	// ====== Update logic ======
 	if len(imageBytes) > 0 {
-		// If may in-upload na bagong image
+		// may bagong image → update kasama image_data
 		_, err = db.Exec(`
-			UPDATE poster
-			SET note1 = $1, remark = $2, image_data = $3
-			WHERE id = $4
-		`, existingNote1, cleanRemark, imageBytes, id)
+            UPDATE poster
+            SET note1 = $1, remark = $2, image_data = $3
+            WHERE id = $4
+        `, existingNote1, cleanRemark, imageBytes, id)
 	} else {
-		// Kung walang bagong image, huwag i-overwrite image_data
+		// walang bagong image → update note1 at remark lang
 		_, err = db.Exec(`
-			UPDATE poster
-			SET note1 = $1, remark = $2
-			WHERE id = $3
-		`, existingNote1, cleanRemark, id)
+            UPDATE poster
+            SET note1 = $1, remark = $2
+            WHERE id = $3
+        `, existingNote1, cleanRemark, id)
 	}
 
 	if err != nil {
